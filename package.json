@@ -1,0 +1,28 @@
+{
+  "name": "window-sections",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "KWin script that tiles the focused window through golden-section and integer fractions",
+  "license": "GPL-2.0-or-later",
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --format=iife --outfile=contents/code/main.js",
+    "check:bundle": "npm run build && git diff --exit-code -- contents/code/main.js",
+    "test": "node --test test/*.test.js",
+    "coverage": "c8 --check-coverage --lines 100 --reporter=text node --test test/*.test.js",
+    "lint:js": "eslint .",
+    "lint:format": "prettier --check .",
+    "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\"",
+    "lint": "npm run lint:js && npm run lint:format && npm run lint:md",
+    "format": "prettier --write .",
+    "package": "node scripts/package.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "c8": "^12.0.0",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.12.0",
+    "markdownlint-cli2": "^0.23.3",
+    "prettier": "^3.9.10"
+  }
+}

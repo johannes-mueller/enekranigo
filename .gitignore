@@ -1,0 +1,15 @@
+# Local planning notes — must never be committed
+/TODO.md
+
+# Node tooling
+node_modules/
+coverage/
+dist/
+
+# Packaging staging
+/build/
+/*.kwin-script
+
+# Editor / OS noise
+*.swp
+.DS_Store

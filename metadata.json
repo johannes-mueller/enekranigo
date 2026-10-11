@@ -1,0 +1,19 @@
+{
+  "KPackageStructure": "KWin/Script",
+  "KPlugin": {
+    "Id": "window-sections",
+    "Name": "Window Sections",
+    "Description": "Tile the focused window through half, golden-section, third and quarter fractions",
+    "Icon": "preferences-system-windows-script-test",
+    "Version": "0.1.0",
+    "License": "GPL-2.0-or-later",
+    "Authors": [
+      {
+        "Name": "Johannes Mueller",
+        "Email": "github@johannes-mueller.org"
+      }
+    ]
+  },
+  "X-Plasma-API": "javascript",
+  "X-Plasma-MainScript": "code/main.js"
+}

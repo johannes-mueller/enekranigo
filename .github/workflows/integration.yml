@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+name: integration
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: integration-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    name: nested KWin end-to-end
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    # KWin's virtual backend can be flaky on shared runners; a red run is a
+    # signal to triage, not an automatic release blocker.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install runtime dependencies
+        run: dnf install -y kwin kf6-kpackage nodejs npm git dbus-daemon
+      - run: npm ci
+      - name: Run the end-to-end smoke test
+        run: ./scripts/e2e.sh

@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+name: package
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: package-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  install:
+    name: install the KPackage
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tooling
+        run: dnf install -y kf6-kpackage nodejs npm git
+      - run: npm ci
+      - name: Build and stage the package
+        run: |
+          npm run build
+          npm run package
+      - name: Install the KPackage
+        run: kpackagetool6 --type=KWin/Script --install dist/window-sections
+      - name: Verify the KPackage is registered
+        run: kpackagetool6 --type=KWin/Script --list | grep -q window-sections

@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit:
+    name: unit tests (node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['20', '22']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - name: Install tooling
+        run: npm ci
+      - name: Build the bundle
+        run: npm run build
+      - name: Ensure the committed bundle is in sync
+        run: git diff --exit-code -- contents/code/main.js
+      - name: Run tests with the coverage gate
+        run: npm run coverage
+      - name: Coverage table in the job summary
+        run: npx c8 report --reporter=text >> "$GITHUB_STEP_SUMMARY"

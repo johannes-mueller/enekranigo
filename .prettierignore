@@ -1,0 +1,7 @@
+node_modules/
+coverage/
+dist/
+build/
+contents/code/main.js
+package-lock.json
+TODO.md
