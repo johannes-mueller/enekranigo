@@ -7,10 +7,7 @@
  * survives manual resizes and KWin restarts without any stored state.
  */
 
-import { FULL, HALF, QUARTER, STEPS } from './geometry.js';
-
-/** Default pixel tolerance for edge detection. */
-export const DEFAULT_PIXEL_TOLERANCE = 2;
+import { DEFAULT_PIXEL_TOLERANCE, FULL, HALF, QUARTER, STEPS, isAnchored } from './geometry.js';
 
 /** Default tolerance when comparing a measured fraction with a cycle step. */
 export const DEFAULT_FRACTION_TOLERANCE = 0.01;
@@ -110,31 +107,6 @@ function smallestAbove(current, tolerance) {
     }
   }
   return found;
-}
-
-/**
- * Whether a window is anchored to the given side's work-area edge.
- *
- * @param {{ x: number, y: number, width: number, height: number }} area Work area.
- * @param {'left'|'right'|'up'|'down'} side Side to check.
- * @param {{ x: number, y: number, width: number, height: number }} rect Window rectangle.
- * @param {number} tolerance Pixel tolerance.
- * @returns {boolean} True when the relevant edge touches the work area.
- * @throws {Error} If `side` is not a known side.
- */
-function isAnchored(area, side, rect, tolerance) {
-  switch (side) {
-    case 'left':
-      return Math.abs(rect.x - area.x) <= tolerance;
-    case 'right':
-      return Math.abs(rect.x + rect.width - (area.x + area.width)) <= tolerance;
-    case 'up':
-      return Math.abs(rect.y - area.y) <= tolerance;
-    case 'down':
-      return Math.abs(rect.y + rect.height - (area.y + area.height)) <= tolerance;
-    default:
-      throw new Error(`unknown side: ${side}`);
-  }
 }
 
 /**

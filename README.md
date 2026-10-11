@@ -93,9 +93,12 @@ A window that fills the whole work area touches both edges and therefore counts
 as the shortcut's own edge, so the next press shrinks it to the larger golden
 section.
 
-Left/right sections span the full height of the work area, up/down sections span
-the full width. The state is derived purely from the window geometry, so
-manually moving or resizing a window resets the cycle.
+Each shortcut only changes its own axis. If the window is already snapped on the
+perpendicular axis (flush to the top or bottom edge for the horizontal
+shortcuts, or to the left or right edge for the vertical ones) it keeps its exact
+position and size there; otherwise it is stretched to the full work area on that
+axis. The state is derived purely from the window geometry, so manually moving or
+resizing a window resets the cycle.
 
 ## Development
 

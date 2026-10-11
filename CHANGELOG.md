@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   section, a third, a quarter, the full work area and the larger golden section.
   A window anchored to the opposite edge cycles in reverse, so one shortcut both
   shrinks and grows the window.
+- Snapping only changes the invoked axis: a window already snapped on the
+  perpendicular axis keeps its exact position and size there, and one that is
+  not snapped is stretched to the full work area on that axis.
 - Packaging metadata for a KWin 6 script (`KWin/Script` KPackage).
 - Unit tests with enforced 100% line coverage.
 - CI workflows for tests, linting, packaging and end-to-end checks.

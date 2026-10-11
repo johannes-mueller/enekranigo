@@ -3,8 +3,18 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { DEFAULT_FRACTION_TOLERANCE, DEFAULT_PIXEL_TOLERANCE, nextSection } from '../src/cycle.js';
-import { FULL, GOLDEN_LARGE, GOLDEN_SMALL, HALF, QUARTER, THIRD, tileRect } from '../src/geometry.js';
+import { DEFAULT_FRACTION_TOLERANCE, nextSection } from '../src/cycle.js';
+import {
+  DEFAULT_PIXEL_TOLERANCE,
+  FULL,
+  GOLDEN_LARGE,
+  GOLDEN_SMALL,
+  HALF,
+  QUARTER,
+  THIRD,
+  perpendicularBand,
+  tileRect,
+} from '../src/geometry.js';
 
 const AREA = { x: 0, y: 0, width: 1000, height: 800 };
 
@@ -17,6 +27,19 @@ const AREA = { x: 0, y: 0, width: 1000, height: 800 };
  */
 function rectFor(side, fraction) {
   return tileRect(AREA, side, fraction);
+}
+
+/**
+ * Resolve a command the way the adapter does, preserving the perpendicular
+ * axis when the window is already snapped there.
+ *
+ * @param {'left'|'right'|'up'|'down'} command Direction that was invoked.
+ * @param {{ x: number, y: number, width: number, height: number }} rect Window rectangle.
+ * @returns {{ x: number, y: number, width: number, height: number }} Target rectangle.
+ */
+function resolve(command, rect) {
+  const { side, fraction } = nextSection(AREA, command, rect);
+  return tileRect(AREA, side, fraction, perpendicularBand(AREA, side, rect));
 }
 
 describe('tolerances', () => {
@@ -151,5 +174,34 @@ describe('nextSection', () => {
 
   it('rejects unknown commands', () => {
     assert.throws(() => nextSection(AREA, 'diagonal', rectFor('left', HALF)), /unknown side/);
+  });
+});
+
+describe('perpendicular preservation', () => {
+  it('keeps a vertically snapped window in place while cycling horizontally', () => {
+    const topHalf = { x: 0, y: 0, width: 1000, height: 400 };
+    assert.deepEqual(resolve('left', topHalf), { x: 0, y: 0, width: 618, height: 400 });
+    const topLeftQuarter = { x: 0, y: 0, width: 500, height: 400 };
+    assert.deepEqual(resolve('right', topLeftQuarter), { x: 0, y: 0, width: 618, height: 400 });
+  });
+
+  it('keeps a horizontally snapped window in place while cycling vertically', () => {
+    const leftHalf = { x: 0, y: 0, width: 500, height: 800 };
+    assert.deepEqual(resolve('up', leftHalf), { x: 0, y: 0, width: 500, height: 494 });
+  });
+
+  it('keeps the perpendicular extent when the commanded axis is unanchored', () => {
+    const topFloating = { x: 200, y: 0, width: 500, height: 400 };
+    assert.deepEqual(resolve('left', topFloating), { x: 0, y: 0, width: 500, height: 400 });
+  });
+
+  it('falls back to the full perpendicular extent when the window is not snapped there', () => {
+    const floating = { x: 400, y: 300, width: 500, height: 400 };
+    assert.deepEqual(resolve('left', floating), { x: 0, y: 0, width: 500, height: 800 });
+  });
+
+  it('preserves an exact odd perpendicular size', () => {
+    const topOdd = { x: 0, y: 0, width: 500, height: 377 };
+    assert.deepEqual(resolve('left', topOdd), { x: 0, y: 0, width: 382, height: 377 });
   });
 });

@@ -14,7 +14,7 @@ can be unit tested in plain Node.js:
 
 | Module             | Responsibility                                              | KWin dependency |
 | ------------------ | ----------------------------------------------------------- | --------------- |
-| `src/geometry.js`  | Fraction constants and the tiling maths (`tileRect`).       | none            |
+| `src/geometry.js`  | Fractions and the tiling maths (`tileRect`, bands).         | none            |
 | `src/cycle.js`     | Pick the next section from the window geometry.             | none            |
 | `src/shortcuts.js` | Shortcut identifiers, descriptions and default keys.        | none            |
 | `src/main.js`      | Register shortcuts, read the active window, apply geometry. | all of it       |
@@ -56,9 +56,13 @@ Fractions used:
 | `GOLDEN_LARGE` | `1/φ ≈ 0.618034`  | larger part of the golden section  |
 | `FULL`         | `1`               | the whole work area                |
 
-`tileRect(area, side, fraction)` measures `fraction` along the axis the side
-moves on. Left and right placements span the full height of the work area,
-up and down placements span the full width. Right and down placements are
+`tileRect(area, side, fraction, band)` measures `fraction` along the axis the
+side moves on. The perpendicular axis comes from `band`, an optional
+`{ start, size }` pair, and defaults to the full width or height of the work
+area. `perpendicularBand(area, side, rect, options)` produces it: when the window
+is already flush to a work-area edge on that axis (within the pixel tolerance)
+its exact offset and size are kept, so snapping along one axis does not disturb
+the other; otherwise the whole work area is used. Right and down placements are
 computed from the far edge (`area.x + area.width - width`) so they stay anchored
 even when the rounded width does not divide the area evenly.
 
@@ -87,6 +91,12 @@ A window that fills the whole work area touches both edges, so it counts as the
 command's own edge and shrinks to `GOLDEN_LARGE`. Because the state is derived
 from geometry it survives manual resizes, script reloads and KWin restarts, and
 needs no per-window bookkeeping that could leak.
+
+Each command only changes its own axis. The perpendicular axis is taken from
+`perpendicularBand`: a window already snapped on that axis keeps its exact
+position and size, so a top-anchored window can be cycled horizontally without
+losing its height; a window not snapped there is stretched to the full work area
+on that axis.
 
 ## KWin touchpoints
 

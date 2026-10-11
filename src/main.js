@@ -8,12 +8,9 @@
  * the pure core modules.
  */
 
-import { tileRect } from './geometry.js';
+import { DEFAULT_PIXEL_TOLERANCE, perpendicularBand, tileRect } from './geometry.js';
 import { nextSection } from './cycle.js';
 import { DEFAULT_KEYS, SHORTCUTS, SHORTCUT_TEXTS } from './shortcuts.js';
-
-/** Pixel tolerance used when matching a window against the work-area edges. */
-const PIXEL_TOLERANCE = 2;
 
 /** Register every shortcut exposed by the script. */
 function register() {
@@ -46,8 +43,10 @@ function shiftWindow(command) {
 
   const area = workArea(window);
   const rect = geometryOf(window);
-  const { side, fraction } = nextSection(area, command, rect, { pixelTolerance: PIXEL_TOLERANCE });
-  applyGeometry(window, tileRect(area, side, fraction));
+  const options = { pixelTolerance: DEFAULT_PIXEL_TOLERANCE };
+  const { side, fraction } = nextSection(area, command, rect, options);
+  const band = perpendicularBand(area, side, rect, options);
+  applyGeometry(window, tileRect(area, side, fraction, band));
 }
 
 /**
