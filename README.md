@@ -1,5 +1,7 @@
 # Enekranigo
 
+Arrange your Kwin/Plasma windows on big screens conveniently.
+
 ## Synopsis
 
 Enekranigo is a KWin script for KDE Plasma 6 that tiles the focused window
@@ -7,6 +9,9 @@ through a cycle of proportions. Four directional shortcuts move the window one
 step at a time through half, the smaller golden section, a third, a quarter, the
 full work area and the larger golden section. A shortcut grows the window when
 it is anchored to the opposite edge, so a single key both shrinks and expands.
+
+The name *enekranigo* originates from Esperanto and means something like "the
+act of putting something onto a screen".
 
 ## Getting started
 
