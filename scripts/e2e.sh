@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-or-later
 #
-# End-to-end smoke test for the window-sections KWin script.
+# End-to-end smoke test for the Enekranigo KWin script.
 #
 # It stages and installs the KPackage, starts a headless (virtual) nested KWin
 # inside its own D-Bus session, loads the script through KWin's scripting D-Bus

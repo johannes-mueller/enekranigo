@@ -2,7 +2,7 @@
 
 ## Overview
 
-Window Sections is a KWin script packaged as a `KWin/Script` KPackage. KWin loads
+Enekranigo is a KWin script packaged as a `KWin/Script` KPackage. KWin loads
 a single JavaScript file (`contents/code/main.js`) into its Qt script engine and
 executes it. The script registers four global shortcuts and, when one is invoked,
 moves or resizes the currently focused window.

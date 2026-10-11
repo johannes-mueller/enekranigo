@@ -1,8 +1,8 @@
-# Window Sections
+# Enekranigo
 
 ## Synopsis
 
-Window Sections is a KWin script for KDE Plasma 6 that tiles the focused window
+Enekranigo is a KWin script for KDE Plasma 6 that tiles the focused window
 through a cycle of proportions. Four directional shortcuts move the window one
 step at a time through half, the smaller golden section, a third, a quarter, the
 full work area and the larger golden section. A shortcut grows the window when
@@ -37,7 +37,7 @@ Alternatively, install it from _System Settings → Window Management → KWin
 Scripts → Install from file_ using an archive created with
 `npm run package -- --archive`.
 
-After installing, enable **Window Sections** under
+After installing, enable **Enekranigo** under
 _System Settings → Window Management → KWin Scripts_ and apply the change. KWin
 picks up the script immediately; no session restart is required.
 
@@ -54,12 +54,12 @@ bound by default, so they do not clash with KWin's built-in `Meta+Arrow`
 quick-tile actions. Assign keys under
 _System Settings → … → Keyboard → Shortcuts → KWin_.
 
-| Action                              | Description                                                            |
-| ----------------------------------- | ---------------------------------------------------------------------- |
-| Window Sections: shift window left  | Move the window along the horizontal axis, anchored to the left edge.  |
-| Window Sections: shift window right | Move the window along the horizontal axis, anchored to the right edge. |
-| Window Sections: shift window up    | Move the window along the vertical axis, anchored to the top edge.     |
-| Window Sections: shift window down  | Move the window along the vertical axis, anchored to the bottom edge.  |
+| Action                         | Description                                                            |
+| ------------------------------ | ---------------------------------------------------------------------- |
+| Enekranigo: shift window left  | Move the window along the horizontal axis, anchored to the left edge.  |
+| Enekranigo: shift window right | Move the window along the horizontal axis, anchored to the right edge. |
+| Enekranigo: shift window up    | Move the window along the vertical axis, anchored to the top edge.     |
+| Enekranigo: shift window down  | Move the window along the vertical axis, anchored to the bottom edge.  |
 
 ### The tiling cycle
 

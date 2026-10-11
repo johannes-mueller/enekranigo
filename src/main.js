@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 /**
- * KWin adapter for the window-sections script.
+ * KWin adapter for the Enekranigo script.
  *
  * This is the only module that touches KWin globals. It registers the global
  * shortcuts, resolves the active window and applies the geometry produced by

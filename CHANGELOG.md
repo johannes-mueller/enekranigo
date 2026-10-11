@@ -23,5 +23,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Unit tests with enforced 100% line coverage.
 - CI workflows for tests, linting, packaging and end-to-end checks.
 
+### Changed
+
+- Renamed the project to Enekranigo. The KPackage id, install directory and
+  shortcut ids remain `window-sections`.
+
 [Unreleased]: https://invent.kde.org/sdk/window-sections/-/compare/v0.1.0...HEAD
 [0.1.0]: https://invent.kde.org/sdk/window-sections/-/releases/v0.1.0

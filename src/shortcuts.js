@@ -18,10 +18,10 @@ export const SHORTCUTS = Object.freeze({
 
 /** Human readable descriptions shown in the Shortcuts settings module. */
 export const SHORTCUT_TEXTS = Object.freeze({
-  left: 'Window Sections: shift window left',
-  right: 'Window Sections: shift window right',
-  up: 'Window Sections: shift window up',
-  down: 'Window Sections: shift window down',
+  left: 'Enekranigo: shift window left',
+  right: 'Enekranigo: shift window right',
+  up: 'Enekranigo: shift window up',
+  down: 'Enekranigo: shift window down',
 });
 
 /**

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 /**
- * Pure cycling logic for the window-sections KWin script.
+ * Pure cycling logic for the Enekranigo KWin script.
  *
  * The current step is derived from the window's own geometry, so the cycle
  * survives manual resizes and KWin restarts without any stored state.

@@ -2,7 +2,7 @@
   "KPackageStructure": "KWin/Script",
   "KPlugin": {
     "Id": "window-sections",
-    "Name": "Window Sections",
+    "Name": "Enekranigo",
     "Description": "Cycle the focused window through half, golden-section, third, quarter, full and golden-large fractions",
     "Icon": "preferences-system-windows-script-test",
     "Version": "0.1.0",

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 /**
- * Pure geometry core for the window-sections KWin script.
+ * Pure geometry core for the Enekranigo KWin script.
  *
  * Everything here works on plain rectangle objects of the shape
  * `{ x, y, width, height }` and never touches KWin globals, Qt types or

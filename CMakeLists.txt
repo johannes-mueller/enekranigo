@@ -1,12 +1,12 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 #
-# Canonical KDE build for the window-sections KWin script. The JavaScript bundle
+# Canonical KDE build for the Enekranigo KWin script. The JavaScript bundle
 # is produced by npm/esbuild; this CMake project only installs the KPackage
 # payload to the KWin scripts directory.
 
 cmake_minimum_required(VERSION 3.16)
 
-project(window-sections VERSION 0.1.0 LANGUAGES NONE)
+project(enekranigo VERSION 0.1.0 LANGUAGES NONE)
 
 find_package(ECM 6.0 REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
