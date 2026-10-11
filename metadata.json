@@ -3,7 +3,7 @@
   "KPlugin": {
     "Id": "window-sections",
     "Name": "Window Sections",
-    "Description": "Tile the focused window through half, golden-section, third and quarter fractions",
+    "Description": "Cycle the focused window through half, golden-section, third, quarter, full and golden-large fractions",
     "Icon": "preferences-system-windows-script-test",
     "Version": "0.1.0",
     "License": "GPL-2.0-or-later",

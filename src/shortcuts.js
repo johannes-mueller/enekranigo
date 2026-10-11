@@ -8,24 +8,20 @@
  * the packaging test verify them without loading any KWin global.
  */
 
-/** Shortcut object names, keyed by the action they trigger. */
+/** Shortcut object names, keyed by the direction they trigger. */
 export const SHORTCUTS = Object.freeze({
-  left: 'window-sections-left',
-  right: 'window-sections-right',
-  up: 'window-sections-up',
-  down: 'window-sections-down',
-  expandHorizontal: 'window-sections-expand-horizontal',
-  expandVertical: 'window-sections-expand-vertical',
+  left: 'window-sections-shift-left',
+  right: 'window-sections-shift-right',
+  up: 'window-sections-shift-up',
+  down: 'window-sections-shift-down',
 });
 
 /** Human readable descriptions shown in the Shortcuts settings module. */
 export const SHORTCUT_TEXTS = Object.freeze({
-  left: 'Window Sections: tile left (cycle half, golden, third, quarter)',
-  right: 'Window Sections: tile right (cycle half, golden, third, quarter)',
-  up: 'Window Sections: tile up (cycle half, golden, third, quarter)',
-  down: 'Window Sections: tile down (cycle half, golden, third, quarter)',
-  expandHorizontal: 'Window Sections: expand to the larger golden section horizontally',
-  expandVertical: 'Window Sections: expand to the larger golden section vertically',
+  left: 'Window Sections: shift window left',
+  right: 'Window Sections: shift window right',
+  up: 'Window Sections: shift window up',
+  down: 'Window Sections: shift window down',
 });
 
 /**
@@ -38,6 +34,4 @@ export const DEFAULT_KEYS = Object.freeze({
   right: '',
   up: '',
   down: '',
-  expandHorizontal: '',
-  expandVertical: '',
 });

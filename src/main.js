@@ -8,8 +8,8 @@
  * the pure core modules.
  */
 
-import { expandRect, tileRect } from './geometry.js';
-import { nextStep } from './cycle.js';
+import { tileRect } from './geometry.js';
+import { nextSection } from './cycle.js';
 import { DEFAULT_KEYS, SHORTCUTS, SHORTCUT_TEXTS } from './shortcuts.js';
 
 /** Pixel tolerance used when matching a window against the work-area edges. */
@@ -17,12 +17,10 @@ const PIXEL_TOLERANCE = 2;
 
 /** Register every shortcut exposed by the script. */
 function register() {
-  bind('left', () => tileSide('left'));
-  bind('right', () => tileSide('right'));
-  bind('up', () => tileSide('up'));
-  bind('down', () => tileSide('down'));
-  bind('expandHorizontal', () => expandAxis('horizontal'));
-  bind('expandVertical', () => expandAxis('vertical'));
+  bind('left', () => shiftWindow('left'));
+  bind('right', () => shiftWindow('right'));
+  bind('up', () => shiftWindow('up'));
+  bind('down', () => shiftWindow('down'));
 }
 
 /**
@@ -36,11 +34,11 @@ function bind(key, callback) {
 }
 
 /**
- * Apply the next tiling step of one side to the active window.
+ * Move the active window to the next section in one direction.
  *
- * @param {'left'|'right'|'up'|'down'} side Side that was invoked.
+ * @param {'left'|'right'|'up'|'down'} command Direction that was invoked.
  */
-function tileSide(side) {
+function shiftWindow(command) {
   const window = manageableActiveWindow();
   if (!window) {
     return;
@@ -48,24 +46,8 @@ function tileSide(side) {
 
   const area = workArea(window);
   const rect = geometryOf(window);
-  const fraction = nextStep(area, side, rect, { pixelTolerance: PIXEL_TOLERANCE });
+  const { side, fraction } = nextSection(area, command, rect, { pixelTolerance: PIXEL_TOLERANCE });
   applyGeometry(window, tileRect(area, side, fraction));
-}
-
-/**
- * Expand the active window to the larger golden section along one axis.
- *
- * @param {'horizontal'|'vertical'} axis Axis to expand along.
- */
-function expandAxis(axis) {
-  const window = manageableActiveWindow();
-  if (!window) {
-    return;
-  }
-
-  const area = workArea(window);
-  const rect = geometryOf(window);
-  applyGeometry(window, expandRect(area, axis, rect, PIXEL_TOLERANCE));
 }
 
 /**

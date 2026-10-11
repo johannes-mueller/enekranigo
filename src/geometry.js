@@ -26,14 +26,19 @@ export const QUARTER = 1 / 4;
 /** Fraction of the work area used for the larger part of the golden section. */
 export const GOLDEN_LARGE = 1 / PHI;
 
-/** Tiling fractions in cycle order, largest first. */
-export const STEPS = [HALF, GOLDEN_SMALL, THIRD, QUARTER];
+/** Fraction of the work area used by a full-size window. */
+export const FULL = 1;
+
+/**
+ * Every tiling fraction, ascending.
+ *
+ * The cycling logic snaps a measured size to the neighbouring entry, so the
+ * order matters.
+ */
+export const STEPS = [QUARTER, THIRD, GOLDEN_SMALL, HALF, GOLDEN_LARGE, FULL];
 
 /** Sides accepted by {@link tileRect}. */
 export const SIDES = ['left', 'right', 'up', 'down'];
-
-/** Axes accepted by {@link expandRect}. */
-export const AXES = ['horizontal', 'vertical'];
 
 /**
  * Compute the rectangle for placing a window against one side of the work area.
@@ -64,66 +69,4 @@ export function tileRect(area, side, fraction) {
     default:
       throw new Error(`unknown side: ${side}`);
   }
-}
-
-/**
- * Compute the rectangle for expanding a window to the larger golden section
- * along one axis, keeping the work-area edge the window currently touches.
- *
- * The window keeps its position and extent on the other axis. When the window
- * touches neither edge of the given axis, the larger part is centered.
- *
- * @param {{ x: number, y: number, width: number, height: number }} area Work area.
- * @param {'horizontal'|'vertical'} axis Axis to expand along.
- * @param {{ x: number, y: number, width: number, height: number }} rect Current window rectangle.
- * @param {number} [tolerance] Pixel tolerance for deciding which edge is touched.
- * @returns {{ x: number, y: number, width: number, height: number }} Target rectangle.
- * @throws {Error} If `axis` is not a known axis.
- */
-export function expandRect(area, axis, rect, tolerance = 0) {
-  if (axis === 'horizontal') {
-    const width = Math.round(area.width * GOLDEN_LARGE);
-    return {
-      x: anchoredOrigin(area.x, area.width, width, rect.x, rect.width, tolerance),
-      y: rect.y,
-      width,
-      height: rect.height,
-    };
-  }
-
-  if (axis === 'vertical') {
-    const height = Math.round(area.height * GOLDEN_LARGE);
-    return {
-      x: rect.x,
-      y: anchoredOrigin(area.y, area.height, height, rect.y, rect.height, tolerance),
-      width: rect.width,
-      height,
-    };
-  }
-
-  throw new Error(`unknown axis: ${axis}`);
-}
-
-/**
- * Resolve the origin of the expanded rectangle along one axis: pinned to the
- * touched edge, or centered when no edge is touched.
- *
- * @param {number} areaOrigin Origin of the work area on the axis.
- * @param {number} areaExtent Extent of the work area on the axis.
- * @param {number} targetExtent Extent of the expanded window on the axis.
- * @param {number} windowOrigin Origin of the window on the axis.
- * @param {number} windowExtent Extent of the window on the axis.
- * @param {number} tolerance Pixel tolerance for edge detection.
- * @returns {number} Origin of the expanded window on the axis.
- */
-function anchoredOrigin(areaOrigin, areaExtent, targetExtent, windowOrigin, windowExtent, tolerance) {
-  if (Math.abs(windowOrigin - areaOrigin) <= tolerance) {
-    return areaOrigin;
-  }
-
-  if (Math.abs(windowOrigin + windowExtent - (areaOrigin + areaExtent)) <= tolerance) {
-    return areaOrigin + areaExtent - targetExtent;
-  }
-
-  return areaOrigin + Math.round((areaExtent - targetExtent) / 2);
 }

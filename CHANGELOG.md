@@ -11,11 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Directional shortcuts `window-sections-left`, `-right`, `-up` and `-down`
-  that cycle the focused window through half, the smaller golden section,
-  a third and a quarter of the work area.
-- Golden-section expand shortcuts `window-sections-expand-horizontal` and
-  `window-sections-expand-vertical`.
+- Four directional shortcuts `window-sections-shift-left`, `-right`, `-up` and
+  `-down` that cycle the focused window through half, the smaller golden
+  section, a third, a quarter, the full work area and the larger golden section.
+  A window anchored to the opposite edge cycles in reverse, so one shortcut both
+  shrinks and grows the window.
 - Packaging metadata for a KWin 6 script (`KWin/Script` KPackage).
 - Unit tests with enforced 100% line coverage.
 - CI workflows for tests, linting, packaging and end-to-end checks.

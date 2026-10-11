@@ -3,10 +3,10 @@
 ## Synopsis
 
 Window Sections is a KWin script for KDE Plasma 6 that tiles the focused window
-through a cycle of proportions. The four directional shortcuts first put the
-window in the corresponding half of the work area, then shrink it to the smaller
-part of the golden section, a third and a quarter. Two further shortcuts expand
-a window to the larger part of the golden section, horizontally or vertically.
+through a cycle of proportions. Four directional shortcuts move the window one
+step at a time through half, the smaller golden section, a third, a quarter, the
+full work area and the larger golden section. A shortcut grows the window when
+it is anchored to the opposite edge, so a single key both shrinks and expands.
 
 ## Getting started
 
@@ -49,46 +49,53 @@ kpackagetool6 --type=KWin/Script --remove window-sections
 
 ## Usage
 
-The script registers six global shortcuts. None of them is bound by default, so
-they do not clash with KWin's built-in `Meta+Arrow` quick-tile actions. Assign
-keys under _System Settings → … → Keyboard → Shortcuts → KWin_.
+The script registers four global shortcuts, one per direction. None of them is
+bound by default, so they do not clash with KWin's built-in `Meta+Arrow`
+quick-tile actions. Assign keys under
+_System Settings → … → Keyboard → Shortcuts → KWin_.
 
-| Action                                 | Description                                                               |
-| -------------------------------------- | ------------------------------------------------------------------------- |
-| Window Sections: tile left             | Cycle the window through the left sections.                               |
-| Window Sections: tile right            | Cycle the window through the right sections.                              |
-| Window Sections: tile up               | Cycle the window through the top sections.                                |
-| Window Sections: tile down             | Cycle the window through the bottom sections.                             |
-| Window Sections: expand … horizontally | Expand the window to the larger golden section along the horizontal axis. |
-| Window Sections: expand … vertically   | Expand the window to the larger golden section along the vertical axis.   |
+| Action                              | Description                                                            |
+| ----------------------------------- | ---------------------------------------------------------------------- |
+| Window Sections: shift window left  | Move the window along the horizontal axis, anchored to the left edge.  |
+| Window Sections: shift window right | Move the window along the horizontal axis, anchored to the right edge. |
+| Window Sections: shift window up    | Move the window along the vertical axis, anchored to the top edge.     |
+| Window Sections: shift window down  | Move the window along the vertical axis, anchored to the bottom edge.  |
 
 ### The tiling cycle
 
-Each press of a directional shortcut measures the focused window against its
-current position:
+Each press moves the focused window one step through a cycle of six fractions of
+the work area:
 
-1. **Half** – the window occupies half of the work area (1/2). This is the
-   behaviour of the built-in quick-tile actions.
-2. **Golden section** – the window shrinks to the smaller part of the golden
-   section (1/φ² ≈ 0.381966).
-3. **Third** – the window shrinks to a third (1/3).
-4. **Quarter** – the window shrinks to a quarter (1/4).
+| Step         | Fraction | Value    |
+| ------------ | -------- | -------- |
+| Half         | 1/2      | 0.500000 |
+| Golden small | 1/φ²     | 0.381966 |
+| Third        | 1/3      | 0.333333 |
+| Quarter      | 1/4      | 0.250000 |
+| Full         | 1        | 1.000000 |
+| Golden large | 1/φ      | 0.618034 |
 
-A further press wraps back to the half. The shortcut only advances the cycle
-when the window is already anchored to the same edge at one of the four
-fractions; otherwise it starts at the half again. This is derived purely from
-the window geometry, so manually moving or resizing a window resets the cycle.
+The window keeps whichever work-area edge it is already anchored to:
 
-Left/right sections span the full height of the work area, up/down sections
-span the full width.
+- On the shortcut's own edge, for example `shift-left` on a left-anchored
+  window, it walks the cycle forwards and shrinks: half → golden small → third →
+  quarter → full → golden large → half.
+- On the opposite edge, for example `shift-left` on a right-anchored window, it
+  walks the same list backwards and grows: quarter → third → golden small →
+  half → golden large → full.
 
-### Expanding
+A window anchored to neither edge (a floating window) is placed on the
+shortcut's edge at half. A size that is not exactly a step snaps to the adjacent
+step in the direction of travel, so a right-anchored window at 29 % grows to a
+third while a left-anchored window at 29 % shrinks to a quarter.
 
-The two expand shortcuts set the window to the larger part of the golden section
-(1/φ ≈ 0.618034) along one axis. The window keeps whichever work-area edge it
-currently touches: a left-anchored window grows towards the right, a
-right-anchored window towards the left. When it touches neither edge, the larger
-part is centered. The other axis is left untouched.
+A window that fills the whole work area touches both edges and therefore counts
+as the shortcut's own edge, so the next press shrinks it to the larger golden
+section.
+
+Left/right sections span the full height of the work area, up/down sections span
+the full width. The state is derived purely from the window geometry, so
+manually moving or resizing a window resets the cycle.
 
 ## Development
 

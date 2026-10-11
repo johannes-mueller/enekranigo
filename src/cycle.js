@@ -7,7 +7,7 @@
  * survives manual resizes and KWin restarts without any stored state.
  */
 
-import { STEPS } from './geometry.js';
+import { FULL, HALF, QUARTER, STEPS } from './geometry.js';
 
 /** Default pixel tolerance for edge detection. */
 export const DEFAULT_PIXEL_TOLERANCE = 2;
@@ -15,49 +15,101 @@ export const DEFAULT_PIXEL_TOLERANCE = 2;
 /** Default tolerance when comparing a measured fraction with a cycle step. */
 export const DEFAULT_FRACTION_TOLERANCE = 0.01;
 
+/** The work-area edge opposite each command's edge. */
+const OPPOSITE = Object.freeze({ left: 'right', right: 'left', up: 'down', down: 'up' });
+
 /**
- * Find the cycle step a window is currently at for a given side.
+ * Pick the section a directional command should move the window to.
  *
- * A window is considered to be at a step when it is anchored to that side's
- * work-area edge and its extent along the side's axis matches the step's
- * fraction. Anything else (including a larger golden-section window) reports
- * no match, so the next press starts the cycle at its first step.
+ * The window keeps whichever work-area edge it is anchored to. On the command's
+ * own edge it shrinks one step at a time through the cycle; on the opposite
+ * edge it grows through the same cycle in reverse. A window anchored to neither
+ * edge is placed on the command's edge at half. A size that is not exactly at a
+ * step snaps to the adjacent step in the direction of travel.
  *
  * @param {{ x: number, y: number, width: number, height: number }} area Work area.
- * @param {'left'|'right'|'up'|'down'} side Side to check against.
+ * @param {'left'|'right'|'up'|'down'} command Edge whose direction was invoked.
  * @param {{ x: number, y: number, width: number, height: number }} rect Window rectangle.
  * @param {{ pixelTolerance?: number, fractionTolerance?: number }} [options] Tolerances.
- * @returns {number} Index into `STEPS`, or -1 when the window is at no step.
- * @throws {Error} If `side` is not a known side.
+ * @returns {{ side: 'left'|'right'|'up'|'down', fraction: number }} Section to apply.
+ * @throws {Error} If `command` is not a known side.
  */
-export function stepIndexFor(area, side, rect, options = {}) {
+export function nextSection(area, command, rect, options = {}) {
   const pixelTolerance = options.pixelTolerance ?? DEFAULT_PIXEL_TOLERANCE;
   const fractionTolerance = options.fractionTolerance ?? DEFAULT_FRACTION_TOLERANCE;
 
-  if (!isAnchored(area, side, rect, pixelTolerance)) {
-    return -1;
+  const opposite = OPPOSITE[command];
+  const ownAnchored = isAnchored(area, command, rect, pixelTolerance);
+  const oppositeAnchored = isAnchored(area, opposite, rect, pixelTolerance);
+
+  if (!ownAnchored && oppositeAnchored) {
+    const fraction = nextFraction(extentFraction(area, command, rect), 'growing', fractionTolerance);
+    return { side: opposite, fraction };
   }
 
-  const fraction = extentFraction(area, side, rect);
-  return STEPS.findIndex((step) => Math.abs(fraction - step) <= fractionTolerance);
+  if (!ownAnchored) {
+    return { side: command, fraction: HALF };
+  }
+
+  const fraction = nextFraction(extentFraction(area, command, rect), 'shrinking', fractionTolerance);
+  return { side: command, fraction };
 }
 
 /**
- * Fraction for the next press on a given side.
+ * Snap a measured size to the next step in the direction of travel.
  *
- * Starts at the first step when the window is at no step, advances one step
- * otherwise, and wraps from the last step back to the first.
+ * `shrinking` returns the largest step strictly below `current` and wraps to
+ * `FULL` when there is none. `growing` returns the smallest step strictly above
+ * `current` and wraps to `QUARTER` when there is none.
  *
- * @param {{ x: number, y: number, width: number, height: number }} area Work area.
- * @param {'left'|'right'|'up'|'down'} side Side that was invoked.
- * @param {{ x: number, y: number, width: number, height: number }} rect Window rectangle.
- * @param {{ pixelTolerance?: number, fractionTolerance?: number }} [options] Tolerances.
- * @returns {number} Fraction to apply.
- * @throws {Error} If `side` is not a known side.
+ * @param {number} current Measured extent fraction of the work area.
+ * @param {'shrinking'|'growing'} direction Direction of travel.
+ * @param {number} tolerance Fraction tolerance for classifying `current`.
+ * @returns {number} Fraction of the next step.
  */
-export function nextStep(area, side, rect, options = {}) {
-  const index = stepIndexFor(area, side, rect, options);
-  return index < 0 ? STEPS[0] : STEPS[(index + 1) % STEPS.length];
+function nextFraction(current, direction, tolerance) {
+  if (direction === 'shrinking') {
+    return largestBelow(current, tolerance) ?? FULL;
+  }
+  return smallestAbove(current, tolerance) ?? QUARTER;
+}
+
+/**
+ * Find the largest step strictly below a measured size.
+ *
+ * @param {number} current Measured extent fraction.
+ * @param {number} tolerance Fraction tolerance.
+ * @returns {number|undefined} The step, or undefined when there is none.
+ */
+function largestBelow(current, tolerance) {
+  let found;
+  for (const step of STEPS) {
+    if (step < current - tolerance) {
+      found = step;
+    } else {
+      break;
+    }
+  }
+  return found;
+}
+
+/**
+ * Find the smallest step strictly above a measured size.
+ *
+ * @param {number} current Measured extent fraction.
+ * @param {number} tolerance Fraction tolerance.
+ * @returns {number|undefined} The step, or undefined when there is none.
+ */
+function smallestAbove(current, tolerance) {
+  let found;
+  for (let index = STEPS.length - 1; index >= 0; index -= 1) {
+    if (STEPS[index] > current + tolerance) {
+      found = STEPS[index];
+    } else {
+      break;
+    }
+  }
+  return found;
 }
 
 /**
