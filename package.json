@@ -7,14 +7,16 @@
   "license": "GPL-2.0-or-later",
   "scripts": {
     "build": "esbuild src/main.js --bundle --format=iife --outfile=contents/code/main.js",
-    "check:bundle": "npm run build && git diff --exit-code -- contents/code/main.js",
+    "pretest": "npm run build",
     "test": "node --test test/*.test.js",
+    "precoverage": "npm run build",
     "coverage": "c8 --check-coverage --lines 100 --reporter=text node --test test/*.test.js",
     "lint:js": "eslint .",
     "lint:format": "prettier --check .",
     "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\"",
     "lint": "npm run lint:js && npm run lint:format && npm run lint:md",
     "format": "prettier --write .",
+    "prepackage": "npm run build",
     "package": "node scripts/package.mjs"
   },
   "devDependencies": {

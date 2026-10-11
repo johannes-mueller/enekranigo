@@ -102,8 +102,10 @@ npm run package     # stage the installable KPackage into dist/
 ```
 
 The script KWin loads, `contents/code/main.js`, is generated from `src/` by
-esbuild and committed. CI fails when the committed bundle is out of date, so run
-`npm run build` after changing `src/`.
+esbuild and is **not** committed. Run `npm run build` after changing `src/`; the
+`test`, `coverage` and `package` scripts run the build automatically. CI builds
+the bundle from a clean checkout, so the artifact can never drift from the
+source.
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for the module layout and the geometry
 contract, and [AGENTS.md](AGENTS.md) for the project conventions.

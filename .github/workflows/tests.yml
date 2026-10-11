@@ -31,8 +31,6 @@ jobs:
         run: npm ci
       - name: Build the bundle
         run: npm run build
-      - name: Ensure the committed bundle is in sync
-        run: git diff --exit-code -- contents/code/main.js
       - name: Run tests with the coverage gate
         run: npm run coverage
       - name: Coverage table in the job summary

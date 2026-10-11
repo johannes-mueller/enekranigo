@@ -1,6 +1,9 @@
 # Local planning notes — must never be committed
 /TODO.md
 
+# Generated KWin script bundle — build with `npm run build`
+/contents/code/main.js
+
 # Node tooling
 node_modules/
 coverage/

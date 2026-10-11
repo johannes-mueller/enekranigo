@@ -31,12 +31,13 @@ the geometry and cycling behaviour testable without a running compositor.
 ## Build
 
 `npm run build` bundles `src/main.js` and its imports into a single IIFE at
-`contents/code/main.js` using esbuild. The bundle is committed because the
-KPackage must be installable without a build step. CI rebuilds it and fails if
-the committed file differs, so the bundle can never drift from the source.
+`contents/code/main.js` using esbuild. This is a build artifact: it is **not**
+committed. `npm test`, `npm run coverage` and `npm run package` run the build
+first, and CI builds from a clean checkout, so the artifact can never drift from
+the source.
 
-The bundle is excluded from lint, formatting and coverage. `src/` is the source
-of truth.
+The bundle is excluded from lint, formatting, coverage and version control.
+`src/` is the source of truth.
 
 ## Geometry contract
 

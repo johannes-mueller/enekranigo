@@ -8,7 +8,8 @@ with the project initializer and are mandatory for every change.
 - The repository root is the KPackage root. `metadata.json` and `contents/` are
   the installable payload; everything else is development tooling.
 - Source of truth is `src/*.js`, written as ES modules. `contents/code/main.js`
-  is a generated IIFE bundle and is committed.
+  is a generated IIFE bundle and is **not** committed; build it with
+  `npm run build`.
 - Package id and install directory are `window-sections` and must stay in sync.
 - File names use `kebab-case`; tests are `test/<module>.test.js`, one file per
   module. Keep tooling out of `contents/`.
