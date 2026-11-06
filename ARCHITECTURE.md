@@ -39,6 +39,15 @@ the source.
 The bundle is excluded from lint, formatting, coverage and version control.
 `src/` is the source of truth.
 
+## Testing
+
+`test/geometry.test.js` and `test/cycle.test.js` exercise the pure core with
+plain objects. `test/metadata.test.js` checks the packaging and shortcut
+contract, and `test/main.test.js` covers the adapter by installing a stateful
+in-memory KWin environment before importing `src/main.js`. The adapter test
+asserts the registered shortcuts and the resulting window geometry; the real
+KWin globals and the generated bundle are exercised only by `scripts/e2e.sh`.
+
 ## Geometry contract
 
 All geometry is expressed relative to the **work area** of the window's output,
