@@ -7,9 +7,9 @@
 # inside its own D-Bus session, loads the script through KWin's scripting D-Bus
 # interface and fails if KWin reports a JavaScript error.
 #
-# A full geometry assertion needs a real client and display server. Set
-# E2E_CLIENT to a windowed application to additionally exercise the shortcuts;
-# without it, packaging and script loading are verified.
+# This is a smoke test for packaging and script loading. A full geometry
+# assertion needs a real client and display server and is not implemented here.
+# The script exits successfully when one of its required commands is missing.
 
 set -euo pipefail
 
