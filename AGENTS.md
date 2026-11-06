@@ -39,11 +39,16 @@ with the project initializer and are mandatory for every change.
   development must exist as an automated test.
 - Unit tests use the Node.js built-in `node:test` runner and
   `node:assert/strict`. Do not add another runner.
-- Do not use mocks, stubs or spies, and do not assert on implementation details.
-  Test only the public interface of the pure modules.
-- Coverage is measured with `c8` and must be **100% lines**, enforced by
-  `npm run coverage`. Code that genuinely cannot be covered must be marked and
-  justified; unreachable branches should be removed rather than excluded.
+- Do not use mocking libraries or assert on call counts. Test the public
+  interface of each module. The adapter test `test/main.test.js` is the only
+  permitted exception: it installs a hand-written, stateful in-memory KWin
+  environment and asserts registered shortcuts and resulting window state.
+- Coverage is measured with `c8` over every file in `src/` and must be **100%
+  lines**, enforced by `npm run coverage`. Code that genuinely cannot be covered
+  must be marked and justified; unreachable branches should be removed rather
+  than excluded.
+- `src/main.js` is covered through the in-memory adapter test; the real KWin
+  globals and the generated bundle are exercised only by `scripts/e2e.sh`.
 - Add a metadata/packaging test for anything that must stay in sync
   (`metadata.json`, shortcut ids, the generated bundle).
 - End-to-end checks run against a real nested KWin; see `scripts/e2e.sh`.

@@ -10,7 +10,7 @@
     "pretest": "npm run build",
     "test": "node --test test/*.test.js",
     "precoverage": "npm run build",
-    "coverage": "c8 --check-coverage --lines 100 --reporter=text node --test test/*.test.js",
+    "coverage": "c8 --all --include='src/**/*.js' --check-coverage --lines 100 --reporter=text node --test test/*.test.js",
     "lint:js": "eslint .",
     "lint:format": "prettier --check .",
     "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\"",
