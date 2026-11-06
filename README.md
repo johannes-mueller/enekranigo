@@ -10,7 +10,7 @@ step at a time through half, the smaller golden section, a third, a quarter, the
 full work area and the larger golden section. A shortcut grows the window when
 it is anchored to the opposite edge, so a single key both shrinks and expands.
 
-The name *enekranigo* originates from Esperanto and means something like "the
+The name _enekranigo_ originates from Esperanto and means something like "the
 act of putting something onto a screen".
 
 ## Getting started
