@@ -10,7 +10,9 @@ with the project initializer and are mandatory for every change.
 - Source of truth is `src/*.js`, written as ES modules. `contents/code/main.js`
   is a generated IIFE bundle and is **not** committed; build it with
   `npm run build`.
-- Package id and install directory are `window-sections` and must stay in sync.
+- Display name is Enekranigo. The KPackage id and install directory are
+  `window-sections`, and shortcut ids use the `window-sections-` prefix; they
+  are frozen API and must stay in sync.
 - File names use `kebab-case`; tests are `test/<module>.test.js`, one file per
   module. Keep tooling out of `contents/`.
 
@@ -35,8 +37,9 @@ with the project initializer and are mandatory for every change.
 
 ## Tests
 
-- The test suite is the highest priority. Every verification performed during
-  development must exist as an automated test.
+- The test suite is the highest priority. Every behavioural verification
+  performed during development must exist as an automated test. Release metadata
+  checks are listed in `docs/development.md`.
 - Unit tests use the Node.js built-in `node:test` runner and
   `node:assert/strict`. Do not add another runner.
 - Do not use mocking libraries or assert on call counts. Test the public
@@ -50,27 +53,34 @@ with the project initializer and are mandatory for every change.
 - `src/main.js` is covered through the in-memory adapter test; the real KWin
   globals and the generated bundle are exercised only by `scripts/e2e.sh`.
 - Add a metadata/packaging test for anything that must stay in sync
-  (`metadata.json`, shortcut ids, the generated bundle).
+  (`metadata.json`, shortcut ids). The bundle is not committed, so CI always
+  builds it from source instead of comparing it.
 - End-to-end checks run against a real nested KWin; see `scripts/e2e.sh`.
 
 ## CI/CD
 
-- GitHub Actions is the single source of truth. A verification that is not in a
-  workflow did not happen.
-- `tests.yml` builds the bundle, asserts it is in sync, and runs the unit tests
-  with the coverage gate.
+- GitHub Actions is the single source of truth for automated checks. A
+  behavioural verification that is not in a workflow did not happen. Release
+  metadata is checked manually with the checklist in `docs/development.md`.
+- `tests.yml` builds the bundle and runs the unit tests with the coverage gate
+  on Node 20 and 22. The bundle is not committed, so there is no sync check.
 - `lint.yml` runs eslint, prettier, markdownlint, `reuse`, shellcheck and
   actionlint.
 - `package.yml` installs the KPackage with `kpackagetool6` in a KDE container.
-- `integration.yml` runs the end-to-end checks; it is nightly and may be
-  non-blocking, but a red run must be triaged.
+- `integration.yml` runs the nested-KWin smoke test nightly. It may be
+  non-blocking, but a red run must be triaged. It verifies that the package
+  loads without JavaScript errors, not the resulting geometry.
+- No workflow exercises the CMake install path; treat it as distro packaging
+  only.
 
 ## Documentation
 
-- `README.md` carries Synopsis, Getting started, Usage, Development, License and
-  Contributing, in that order.
-- `ARCHITECTURE.md` documents the core/adapter split, the geometry contract and
-  the state machine.
+- `README.md` carries Synopsis, Getting started, Usage, Known limitations,
+  Development, License and Contributing, in that order.
+- `ARCHITECTURE.md` documents the names, core/adapter split, geometry contract
+  and state machine.
+- `docs/development.md` covers the local build/install/debug loop, the e2e
+  caveats and the release checklist.
 - Write JSDoc for every public function, including parameters, return value and
   behaviour. Trivial helpers need no documentation.
 - Keep `CHANGELOG.md` in Keep a Changelog style.
@@ -78,6 +88,7 @@ with the project initializer and are mandatory for every change.
 ## Licensing and releases
 
 - Every source file carries an SPDX header (`GPL-2.0-or-later`).
-- Conventional Commits. Semantic versioning. `metadata.json` `Version`,
-  `CHANGELOG.md` and the git tag must agree.
+- Conventional Commits. Semantic versioning. `package.json`,
+  `metadata.json`, `CMakeLists.txt`, `CHANGELOG.md` and the git tag must agree;
+  the release checklist in `docs/development.md` covers the manual check.
 - `main` is always green.
