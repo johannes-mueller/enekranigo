@@ -2,7 +2,7 @@
 
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { basename, dirname, join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
@@ -18,8 +18,15 @@ describe('metadata.json', () => {
     assert.equal(metadata['X-Plasma-MainScript'], 'code/main.js');
   });
 
-  it('uses the directory name as the package id', () => {
-    assert.equal(metadata.KPlugin.Id, basename(repoRoot));
+  it('uses the stable package id', () => {
+    assert.equal(metadata.KPlugin.Id, 'window-sections');
+  });
+
+  it('installs under the package id', () => {
+    const cmake = readFileSync(join(repoRoot, 'CMakeLists.txt'), 'utf8');
+    const packager = readFileSync(join(repoRoot, 'scripts', 'package.mjs'), 'utf8');
+    assert.match(cmake, new RegExp(`kwin/scripts/${metadata.KPlugin.Id}`));
+    assert.match(packager, new RegExp(`'${metadata.KPlugin.Id}'`));
   });
 
   it('carries the required KPlugin fields', () => {
