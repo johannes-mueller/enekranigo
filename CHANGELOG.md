@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `src/main.js` is now covered by unit tests through an in-memory KWin
   environment, and the coverage gate includes every module under `src/`.
+- Documented the naming and frozen identifiers, the complete cycling sequences,
+  the local development loop, known limitations and the release checklist.
 
 ## [0.1.0] - 2026-10-11
 
@@ -33,5 +35,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Renamed the project to Enekranigo. The KPackage id, install directory and
   shortcut ids remain `window-sections`.
 
-[Unreleased]: https://invent.kde.org/sdk/window-sections/-/compare/v0.1.0...HEAD
-[0.1.0]: https://invent.kde.org/sdk/window-sections/-/releases/v0.1.0
+[Unreleased]: https://github.com/johannes-mueller/enekranigo/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/johannes-mueller/enekranigo/releases/tag/v0.1.0

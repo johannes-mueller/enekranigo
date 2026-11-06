@@ -1,6 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: enekranigo
-Source: https://invent.kde.org/sdk/window-sections
+Source: https://github.com/johannes-mueller/enekranigo
 
 Files: *
 Copyright: 2026 Johannes Mueller <github@johannes-mueller.org>
