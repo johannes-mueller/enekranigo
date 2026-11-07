@@ -32,4 +32,4 @@ jobs:
         with:
           ignore_paths: node_modules
       - name: actionlint
-        uses: raven-actions/actionlint@v1
+        uses: raven-actions/actionlint@v2.2.0
