@@ -29,5 +29,7 @@ jobs:
         uses: fsfe/reuse-action@v5
       - name: shellcheck
         uses: ludeeus/action-shellcheck@master
+        with:
+          ignore_paths: node_modules
       - name: actionlint
         uses: raven-actions/actionlint@v1
