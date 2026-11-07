@@ -4,21 +4,21 @@
 
 Enekranigo is a KWin script packaged as a `KWin/Script` KPackage. KWin loads
 a single JavaScript file (`contents/code/main.js`) into its Qt script engine and
-executes it. The script registers four global shortcuts and, when one is invoked,
-moves or resizes the currently focused window.
+executes it. The script registers eight global shortcuts and, when one is
+invoked, tiles the focused window or moves it to a screen edge.
 
 ## Names and identifiers
 
 The project was renamed to Enekranigo, but the identifiers that KWin and package
 managers store were kept stable:
 
-| Concern                       | Value                     | Stability  |
-| ----------------------------- | ------------------------- | ---------- |
-| Display name                  | Enekranigo                | may change |
-| KPackage id                   | `window-sections`         | frozen     |
-| Install directory             | `window-sections`         | frozen     |
-| Shortcut object names         | `window-sections-shift-*` | frozen     |
-| npm package and CMake project | `enekranigo`              | internal   |
+| Concern                       | Value                            | Stability  |
+| ----------------------------- | -------------------------------- | ---------- |
+| Display name                  | Enekranigo                       | may change |
+| KPackage id                   | `window-sections`                | frozen     |
+| Install directory             | `window-sections`                | frozen     |
+| Shortcut object names         | `window-sections-{shift,move}-*` | frozen     |
+| npm package and CMake project | `enekranigo`                     | internal   |
 
 The KPackage id appears in `metadata.json`, the install paths in
 `CMakeLists.txt` and `scripts/package.mjs`, and the install/uninstall commands in
@@ -40,13 +40,14 @@ can be unit tested in plain Node.js:
 | ------------------ | ----------------------------------------------------------- | --------------- |
 | `src/geometry.js`  | Fractions and the tiling maths (`tileRect`, bands).         | none            |
 | `src/cycle.js`     | Pick the next section from the window geometry.             | none            |
+| `src/move.js`      | Edge alignment and movement between outputs.                | none            |
 | `src/shortcuts.js` | Shortcut identifiers, descriptions and default keys.        | none            |
 | `src/main.js`      | Register shortcuts, read the active window, apply geometry. | all of it       |
 
 `src/main.js` is the only module that references the KWin globals `workspace`,
 `registerShortcut` and `KWin`. It is deliberately small and contains no
-arithmetic; it only reads the active window, calls the pure core and assigns the
-resulting rectangle.
+arithmetic; it only reads the active window and outputs, calls the pure core and
+assigns the resulting rectangle.
 
 The pure modules operate on plain objects of the shape
 `{ x, y, width, height }` and never see Qt or QRectF types. That is what makes
@@ -65,12 +66,13 @@ The bundle is excluded from lint, formatting, coverage and version control.
 
 ## Testing
 
-`test/geometry.test.js` and `test/cycle.test.js` exercise the pure core with
-plain objects. `test/metadata.test.js` checks the packaging and shortcut
-contract, and `test/main.test.js` covers the adapter by installing a stateful
-in-memory KWin environment before importing `src/main.js`. The adapter test
-asserts the registered shortcuts and the resulting window geometry; the real
-KWin globals and the generated bundle are exercised only by `scripts/e2e.sh`.
+`test/geometry.test.js`, `test/cycle.test.js` and `test/move.test.js` exercise
+the pure core with plain objects. `test/metadata.test.js` checks the packaging
+and shortcut contract, and `test/main.test.js` covers the adapter by installing
+a stateful in-memory KWin environment before importing `src/main.js`. The
+adapter test asserts the registered shortcuts and the resulting window
+geometry; the real KWin globals and the generated bundle are exercised only by
+`scripts/e2e.sh`.
 
 `npm run coverage` includes every file in `src/` via c8's `--all` option, so a
 new module cannot hide from the gate. The adapter test uses a hand-written
@@ -160,6 +162,34 @@ position and size, so a top-anchored window can be cycled horizontally without
 losing its height; a window not snapped there is stretched to the full work area
 on that axis.
 
+## Screen movement contract
+
+The move shortcuts share the pure `src/move.js` module. A screen is represented
+as `{ bounds, area }`: `bounds` is the physical output geometry from
+`output.geometry`, used for adjacency, and `area` is the work area from
+`workspace.clientArea(KWin.MaximizeArea, output, workspace.currentDesktop)`.
+
+`screenIndexAt(screens, rect)` selects the output containing the window centre,
+falling back to the nearest output, mirroring KWin's own output lookup.
+
+`moveRect(screens, current, command, rect, options)` performs one step:
+
+- If the window is not anchored to the commanded edge, align it to that edge of
+  the current work area without resizing.
+- If it is anchored, find the nearest output in that direction whose `bounds`
+  overlap the current output on the perpendicular axis. Outputs are ordered by
+  centre coordinate, so diagonal outputs are not neighbours.
+- With no neighbour the function returns `null` and the adapter changes nothing.
+- With a neighbour the window is placed on the opposite edge of the target work
+  area. Width and height are clamped independently to the target work area, and
+  the perpendicular coordinate is clamped so the window stays visible.
+
+Edge detection reuses the 2 px pixel tolerance. Snapping never changes the
+window's size; only cross-output placement can shrink an axis, and only when the
+window is larger than the target work area. This is a geometry-only fit and does
+not set KWin's maximized state. The adapter restores fullscreen and maximized
+windows before applying an actual move, but a no-op leaves the state untouched.
+
 ## KWin touchpoints
 
 - `registerShortcut(name, text, key, callback)` registers each action. The
@@ -168,8 +198,13 @@ on that axis.
 - `workspace.activeWindow` is resolved and validated. Windows that are not
   managed, already deleted, special (panels, desktops, popups) or not
   moveable/resizable are ignored.
+- `workspace.screens` provides the outputs, and `output.geometry` supplies the
+  physical bounds used to decide which outputs are neighbours.
+- `workspace.clientArea(KWin.MaximizeArea, output, workspace.currentDesktop)`
+  supplies each output's work area, so move placement excludes panels.
 - `window.fullScreen = false` and `window.setMaximize(false, false)` restore a
-  window before tiling so that a maximized or fullscreen window can be tiled.
+  window before tiling or moving so that a maximized or fullscreen window can be
+  handled.
 - `window.frameGeometry = rect` applies the new geometry. Assigning a plain
   rectangle object is the supported way to move and resize from a script.
 - KWin's native tiling/quick-tile state is not explicitly cleared. The script
@@ -183,6 +218,15 @@ on that axis.
   per-window state is stored and manual resizes or restarts reset the cycle.
 - **One action per direction.** There are no separate expand shortcuts; a window
   anchored to the opposite edge grows through the same cycle in reverse.
+- **Separate move actions.** The four move shortcuts snap a window to an edge
+  without resizing it and cross to the nearest adjacent output when the window is
+  already at that edge. They never call `sendClientToScreen`, which would scale
+  the window relative to the target and break the no-resize contract.
+- **Opposite-edge entry.** A window crossing to a neighbouring output lands on
+  that output's opposite edge, so repeated presses continue in the same visual
+  direction.
+- **Geometry-only fitting.** Oversized windows are clamped to the target work
+  area instead of being put into KWin's maximized state.
 - **Generated bundle.** `contents/code/main.js` is produced from `src/` by
   esbuild and is never committed; the source tree is the only source of truth.
 - **Default keys unassigned.** The shortcuts do not claim `Meta+Arrow`, which

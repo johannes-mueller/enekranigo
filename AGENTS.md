@@ -29,7 +29,7 @@ with the project initializer and are mandatory for every change.
 
 ## Architecture
 
-- Keep the pure core pure: `src/geometry.js`, `src/cycle.js` and
+- Keep the pure core pure: `src/geometry.js`, `src/cycle.js`, `src/move.js` and
   `src/shortcuts.js` must not reference KWin globals, Qt types or config.
 - `src/main.js` is the only adapter and must stay small and free of arithmetic.
 - See [ARCHITECTURE.md](ARCHITECTURE.md) for the geometry contract and the

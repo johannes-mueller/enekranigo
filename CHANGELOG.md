@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Four `window-sections-move-{left,right,up,down}` shortcuts that place the
+  focused window flush to an output edge without resizing it and cross to the
+  nearest adjacent output when the window is already at that edge. Oversized
+  windows are fitted to the target work area, and maximized or fullscreen
+  windows are restored before an actual move.
+
 ### Changed
 
 - `src/main.js` is now covered by unit tests through an in-memory KWin

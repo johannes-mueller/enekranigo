@@ -87,7 +87,9 @@ warnings are the most useful lines when a shortcut appears to do nothing.
 
 The adapter silently ignores a missing, unmanaged, deleted, special or
 non-moveable/non-resizeable window. If a shortcut has no effect, first check
-whether the active window is one the script is allowed to tile.
+whether the active window is one the script is allowed to tile or move. A move
+shortcut also does nothing when the window is already at the outermost output
+edge in that direction.
 
 ## Nested KWin and the end-to-end test
 
@@ -102,7 +104,8 @@ interface and fails if KWin reports a JavaScript error.
 Important caveats:
 
 - It is a smoke test for packaging and script loading. It does not assert the
-  resulting window geometry.
+  resulting window geometry and does not create multiple outputs, so cross-output
+  movement is covered by the unit tests instead.
 - It removes and reinstalls the `window-sections` package in the current user's
   data directory. Run it in a disposable session if you have the script installed
   for daily use.

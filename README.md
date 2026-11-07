@@ -5,10 +5,13 @@ Arrange your Kwin/Plasma windows on big screens conveniently.
 ## Synopsis
 
 Enekranigo is a KWin script for KDE Plasma 6 that tiles the focused window
-through a cycle of proportions. Four directional shortcuts move the window one
-step at a time through half, the smaller golden section, a third, a quarter, the
-full work area and the larger golden section. A shortcut grows the window when
-it is anchored to the opposite edge, so a single key both shrinks and expands.
+through a cycle of proportions and moves windows between screen edges. Four
+directional shift shortcuts move the window one step at a time through half, the
+smaller golden section, a third, a quarter, the full work area and the larger
+golden section. A shortcut grows the window when it is anchored to the opposite
+edge, so a single key both shrinks and expands. Four matching move shortcuts
+place a window at an edge without resizing it and cross to an adjacent output
+when it is already there.
 
 The name _enekranigo_ originates from Esperanto and means something like "the
 act of putting something onto a screen".
@@ -76,9 +79,9 @@ kpackagetool6 --type=KWin/Script --remove window-sections
 
 ## Usage
 
-The script registers four global shortcuts, one per direction. None of them is
-bound by default, so they do not clash with KWin's built-in `Meta+Arrow`
-quick-tile actions. Assign keys under
+The script registers eight global shortcuts: four shift actions and four move
+actions. None of them is bound by default, so they do not clash with KWin's
+built-in `Meta+Arrow` quick-tile actions. Assign keys under
 _System Settings → … → Keyboard → Shortcuts → KWin_.
 
 | Action                         | Description                                                            |
@@ -87,6 +90,10 @@ _System Settings → … → Keyboard → Shortcuts → KWin_.
 | Enekranigo: shift window right | Move the window along the horizontal axis, anchored to the right edge. |
 | Enekranigo: shift window up    | Move the window along the vertical axis, anchored to the top edge.     |
 | Enekranigo: shift window down  | Move the window along the vertical axis, anchored to the bottom edge.  |
+| Enekranigo: move window left   | Move the window to the left edge without resizing it.                  |
+| Enekranigo: move window right  | Move the window to the right edge without resizing it.                 |
+| Enekranigo: move window up     | Move the window to the top edge without resizing it.                   |
+| Enekranigo: move window down   | Move the window to the bottom edge without resizing it.                |
 
 ### The tiling cycle
 
@@ -128,6 +135,28 @@ position and size there; otherwise it is stretched to the full work area on that
 axis. The state is derived purely from the window geometry, so manually moving or
 resizing a window resets the cycle.
 
+### Moving windows without resizing them
+
+`move-left` first places the focused window flush to the left edge of its
+output's work area without changing its size. When the window is already at that
+edge (within the 2 px tolerance), the next press moves it to the output
+immediately to the left, if one exists. On that output it is placed flush to the
+opposite (right) edge. `move-right`, `move-up` and `move-down` mirror this.
+
+An output is a neighbour when its physical geometry overlaps the current output
+on the perpendicular axis; the nearest output by centre in the requested
+direction wins. Screen adjacency uses the full output geometry, while placement
+uses the work area, so panels and other reserved areas stay excluded.
+
+The window keeps its perpendicular position where possible and is clamped into
+the target work area. If it is larger than that work area on an axis, the axis
+is reduced to the full target extent. This is a geometry change only; it does
+not set KWin's maximized state. Maximized and fullscreen windows are restored
+before an actual move.
+
+When the window is already at the edge and no neighbouring output exists, the
+shortcut does nothing and leaves the window's state untouched.
+
 ## Known limitations
 
 - Only the focused window is affected. There are no saved layouts, gaps,
@@ -136,9 +165,13 @@ resizing a window resets the cycle.
   resets which step it is considered to be on.
 - A size that is not exactly a step snaps to the adjacent step in the direction
   of travel, so a manual resize is not preserved.
-- Maximized and fullscreen windows are restored before they are tiled.
-- Non-manageable, deleted or special windows (panels, desktops, popups) are
-  ignored without a message.
+- Maximized and fullscreen windows are restored before they are tiled or moved.
+- Non-manageable, deleted, special or non-moveable/non-resizeable windows
+  (panels, desktops, popups) are ignored without a message.
+- Move actions only cross to outputs that share a perpendicular band; diagonal
+  outputs are not considered neighbours.
+- Cross-output movement clamps the perpendicular position into the target work
+  area, so unusual output arrangements can shift a window.
 - The script does not explicitly clear KWin's native tiling or quick-tile state,
   so behaviour with a window that is already in a native tile is not part of the
   tested contract.
