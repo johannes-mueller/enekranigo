@@ -8,30 +8,37 @@
  * the packaging test verify them without loading any KWin global.
  */
 
-/** Shortcut object names, keyed by the direction they trigger. */
-export const SHORTCUTS = Object.freeze({
-  left: 'window-sections-shift-left',
-  right: 'window-sections-shift-right',
-  up: 'window-sections-shift-up',
-  down: 'window-sections-shift-down',
-});
-
-/** Human readable descriptions shown in the Shortcuts settings module. */
-export const SHORTCUT_TEXTS = Object.freeze({
-  left: 'Enekranigo: shift window left',
-  right: 'Enekranigo: shift window right',
-  up: 'Enekranigo: shift window up',
-  down: 'Enekranigo: shift window down',
-});
+/**
+ * Build a shortcut descriptor.
+ *
+ * @param {'shift'|'move'} kind Action group.
+ * @param {'left'|'right'|'up'|'down'} direction Direction the action moves in.
+ * @returns {{ kind: 'shift'|'move', direction: 'left'|'right'|'up'|'down', id: string, text: string, key: string }} Shortcut descriptor.
+ */
+function shortcut(kind, direction) {
+  return Object.freeze({
+    kind,
+    direction,
+    id: `window-sections-${kind}-${direction}`,
+    text: `Enekranigo: ${kind} window ${direction}`,
+    key: '',
+  });
+}
 
 /**
- * Default key sequences. They are intentionally empty so the script does not
- * clash with the built-in Meta+Arrow quick-tile shortcuts; users assign keys
- * in System Settings.
+ * Every shortcut exposed by the script, in registration order.
+ *
+ * Default key sequences are intentionally empty so the script does not clash
+ * with the built-in Meta+Arrow quick-tile shortcuts; users assign keys in
+ * System Settings.
  */
-export const DEFAULT_KEYS = Object.freeze({
-  left: '',
-  right: '',
-  up: '',
-  down: '',
-});
+export const SHORTCUTS = Object.freeze([
+  shortcut('shift', 'left'),
+  shortcut('shift', 'right'),
+  shortcut('shift', 'up'),
+  shortcut('shift', 'down'),
+  shortcut('move', 'left'),
+  shortcut('move', 'right'),
+  shortcut('move', 'up'),
+  shortcut('move', 'down'),
+]);

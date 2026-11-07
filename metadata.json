@@ -3,7 +3,7 @@
   "KPlugin": {
     "Id": "window-sections",
     "Name": "Enekranigo",
-    "Description": "Cycle the focused window through half, golden-section, third, quarter, full and golden-large fractions",
+    "Description": "Cycle the focused window through half, golden-section, third, quarter, full and golden-large fractions, and move it between screen edges and adjacent outputs",
     "Icon": "preferences-system-windows-script-test",
     "Version": "0.1.0",
     "License": "GPL-2.0-or-later",

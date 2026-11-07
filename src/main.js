@@ -10,24 +10,26 @@
 
 import { DEFAULT_PIXEL_TOLERANCE, perpendicularBand, tileRect } from './geometry.js';
 import { nextSection } from './cycle.js';
-import { DEFAULT_KEYS, SHORTCUTS, SHORTCUT_TEXTS } from './shortcuts.js';
+import { moveRect, screenIndexAt } from './move.js';
+import { SHORTCUTS } from './shortcuts.js';
+
+/** Action handlers keyed by the shortcut kind. */
+const HANDLERS = Object.freeze({ shift: shiftWindow, move: moveWindow });
 
 /** Register every shortcut exposed by the script. */
 function register() {
-  bind('left', () => shiftWindow('left'));
-  bind('right', () => shiftWindow('right'));
-  bind('up', () => shiftWindow('up'));
-  bind('down', () => shiftWindow('down'));
+  for (const shortcut of SHORTCUTS) {
+    registerShortcut(shortcut.id, shortcut.text, shortcut.key, () => handle(shortcut));
+  }
 }
 
 /**
- * Register a single shortcut by key.
+ * Dispatch a shortcut to its action.
  *
- * @param {string} key Key into the shortcut tables.
- * @param {Function} callback Action to run when the shortcut is invoked.
+ * @param {{ kind: 'shift'|'move', direction: 'left'|'right'|'up'|'down' }} shortcut Shortcut descriptor.
  */
-function bind(key, callback) {
-  registerShortcut(SHORTCUTS[key], SHORTCUT_TEXTS[key], DEFAULT_KEYS[key], callback);
+function handle(shortcut) {
+  HANDLERS[shortcut.kind](shortcut.direction);
 }
 
 /**
@@ -50,7 +52,38 @@ function shiftWindow(command) {
 }
 
 /**
- * Resolve the active window when it can actually be tiled.
+ * Move the active window to the edge in one direction.
+ *
+ * A window that is already at the edge crosses to the neighbouring output on
+ * that side, if there is one.
+ *
+ * @param {'left'|'right'|'up'|'down'} command Direction that was invoked.
+ */
+function moveWindow(command) {
+  const window = manageableActiveWindow();
+  if (!window) {
+    return;
+  }
+
+  const rect = geometryOf(window);
+  const screens = screenAreas();
+  const current = screenIndexAt(screens, rect);
+  if (current < 0) {
+    return;
+  }
+
+  const target = moveRect(screens, current, command, rect, {
+    pixelTolerance: DEFAULT_PIXEL_TOLERANCE,
+  });
+  if (!target) {
+    return;
+  }
+
+  applyGeometry(window, target.rect);
+}
+
+/**
+ * Resolve the active window when it can actually be moved or tiled.
  *
  * @returns {object|null} The active window, or null when it must be left alone.
  */
@@ -63,7 +96,7 @@ function manageableActiveWindow() {
  * Whether a window is managed, visible and freely moveable/resizable.
  *
  * @param {object|undefined} window Candidate window.
- * @returns {boolean} True when the window may be tiled.
+ * @returns {boolean} True when the window may be moved or tiled.
  */
 function isManageable(window) {
   return (
@@ -77,13 +110,31 @@ function isManageable(window) {
 }
 
 /**
+ * Read every output as a physical bounds and work-area pair.
+ *
+ * @returns {Array<{ bounds: { x: number, y: number, width: number, height: number }, area: { x: number, y: number, width: number, height: number } }>} Screens in workspace order.
+ */
+function screenAreas() {
+  const outputs = workspace.screens;
+  const screens = [];
+  for (let index = 0; index < outputs.length; index += 1) {
+    const output = outputs[index];
+    screens.push({
+      bounds: rectOf(output.geometry),
+      area: rectOf(workspace.clientArea(KWin.MaximizeArea, output, workspace.currentDesktop)),
+    });
+  }
+  return screens;
+}
+
+/**
  * Work area of the output the window is on, panels excluded.
  *
  * @param {object} window Window to query.
  * @returns {{ x: number, y: number, width: number, height: number }} Work area.
  */
 function workArea(window) {
-  return workspace.clientArea(KWin.MaximizeArea, window);
+  return rectOf(workspace.clientArea(KWin.MaximizeArea, window));
 }
 
 /**
@@ -93,8 +144,17 @@ function workArea(window) {
  * @returns {{ x: number, y: number, width: number, height: number }} Plain rectangle.
  */
 function geometryOf(window) {
-  const frame = window.frameGeometry;
-  return { x: frame.x, y: frame.y, width: frame.width, height: frame.height };
+  return rectOf(window.frameGeometry);
+}
+
+/**
+ * Copy a rectangle-like object into a plain rectangle.
+ *
+ * @param {{ x: number, y: number, width: number, height: number }} rect Rectangle-like object.
+ * @returns {{ x: number, y: number, width: number, height: number }} Plain rectangle.
+ */
+function rectOf(rect) {
+  return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
 }
 
 /**

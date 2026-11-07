@@ -6,7 +6,7 @@ import { dirname, join } from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { DEFAULT_KEYS, SHORTCUTS, SHORTCUT_TEXTS } from '../src/shortcuts.js';
+import { SHORTCUTS } from '../src/shortcuts.js';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
 const metadata = JSON.parse(readFileSync(join(repoRoot, 'metadata.json'), 'utf8'));
@@ -45,18 +45,30 @@ describe('metadata.json', () => {
 });
 
 describe('shortcut ids', () => {
+  const ids = SHORTCUTS.map((shortcut) => shortcut.id);
+
   it('are unique, namespaced and stable', () => {
-    const ids = Object.values(SHORTCUTS);
+    assert.equal(ids.length, 8);
     assert.equal(new Set(ids).size, ids.length);
     for (const id of ids) {
-      assert.match(id, /^window-sections-[a-z-]+$/);
+      assert.match(id, /^window-sections-(shift|move)-[a-z-]+$/);
     }
+    assert.deepEqual([...ids].sort(), [
+      'window-sections-move-down',
+      'window-sections-move-left',
+      'window-sections-move-right',
+      'window-sections-move-up',
+      'window-sections-shift-down',
+      'window-sections-shift-left',
+      'window-sections-shift-right',
+      'window-sections-shift-up',
+    ]);
   });
 
   it('expose a text and an unassigned default key for every shortcut', () => {
-    for (const key of Object.keys(SHORTCUTS)) {
-      assert.ok(SHORTCUT_TEXTS[key], `missing text for ${key}`);
-      assert.equal(DEFAULT_KEYS[key], '');
+    for (const shortcut of SHORTCUTS) {
+      assert.ok(shortcut.text, `missing text for ${shortcut.id}`);
+      assert.equal(shortcut.key, '');
     }
   });
 });
