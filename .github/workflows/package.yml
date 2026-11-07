@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install tooling
-        run: dnf install -y kf6-kpackage nodejs npm git
+        run: dnf install -y kf6-kpackage kwin-common nodejs npm git
       - run: npm ci
       - name: Build and stage the package
         run: |
